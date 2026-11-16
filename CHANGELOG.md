@@ -7,6 +7,13 @@
   uninstall a build installed earlier from a `.vsix` with another ID, or both run side by side.
 - The command palette category, the settings section and the graph view are now called
   _CSV & Excel Plot_ too. Settings (`csvPlot.*`) and command IDs are unchanged.
+- **Histogram zoom**: the same zoom tools as the line chart (mouse wheel, slider, toolbox _Zoom
+  to area_ / _Reset zoom_). Zooming re-bins the visible range, so the bars get narrower and show
+  the detail of that part of the distribution; the count axis follows. The statistics card notes
+  the zoomed range and how many values it holds, while the statistics still describe the whole
+  column. Changing the bin count keeps the zoomed range.
+- Fixed: hiding the side panel made the chart disappear. The chart now fills the width with the
+  panel hidden and comes back to its size when the panel is shown again.
 
 ## 0.3.0 — 2026-11-09
 

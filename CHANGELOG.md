@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.0 — 2026-11-16
 
 - Published on GitHub and the Visual Studio Marketplace under the MIT license, as
   _CSV & Excel Plot_. The extension ID is now `harrahx3.vscode-csv-plot`:

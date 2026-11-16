@@ -2,7 +2,7 @@
   "name": "vscode-csv-plot",
   "displayName": "CSV & Excel Plot",
   "description": "Plot the columns of a CSV file or an Excel sheet as interactive line or stacked-area charts or histograms with statistics, with timestamp support and automatic multiple Y axes.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "harrahx3",
   "author": {
     "name": "harrahx3"

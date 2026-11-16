@@ -1,0 +1,314 @@
+/* Graph view layout: side panel (left) + chart. Colours come from the VS Code theme. */
+:root {
+  --panel-width: 260px;
+  --border: var(--vscode-panel-border, rgba(128, 128, 128, 0.35));
+  --muted: var(--vscode-descriptionForeground, #888);
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--vscode-editor-background);
+  color: var(--vscode-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size, 13px);
+}
+
+#app {
+  display: grid;
+  grid-template-columns: var(--panel-width) 4px 1fr;
+  height: 100vh;
+}
+/* The panel and resizer are display:none, so they leave the grid and the chart becomes its
+   only item: a single column, or the chart would land in the first (zero-width) column. */
+#app.collapsed {
+  grid-template-columns: 1fr;
+}
+#app.collapsed #panel,
+#app.collapsed #resizer {
+  display: none;
+}
+
+#panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--vscode-sideBar-background, transparent);
+}
+#resizer {
+  cursor: col-resize;
+  background: var(--border);
+  opacity: 0.5;
+}
+#resizer:hover {
+  opacity: 1;
+  background: var(--vscode-focusBorder);
+}
+
+#chart-wrap {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+#chart {
+  position: absolute;
+  inset: 8px 8px 4px 8px;
+}
+
+/* Histogram mode: statistics card on the right of the chart. */
+#app.histogram #chart {
+  right: 236px;
+}
+#stats {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  bottom: 4px;
+  width: 220px;
+  overflow-y: auto;
+  padding: 4px 0 4px 12px;
+  border-left: 1px solid var(--border);
+}
+#stats[hidden] {
+  display: none;
+}
+#stats .bins {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.zoom-note {
+  margin: 0 0 8px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.zoom-note[hidden] {
+  display: none;
+}
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.stats-table th,
+.stats-table td {
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border);
+}
+.stats-table th {
+  text-align: left;
+  font-weight: normal;
+  color: var(--muted);
+}
+.stats-table td {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#expand {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  z-index: 2;
+  display: none;
+}
+#app.collapsed #expand {
+  display: block;
+}
+
+#overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--vscode-editor-background);
+  color: var(--muted);
+}
+#overlay[hidden] {
+  display: none;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+section {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.settings {
+  display: grid;
+  gap: 6px;
+}
+.settings label {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  align-items: center;
+}
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.section-title .count {
+  color: var(--muted);
+  font-weight: normal;
+}
+.section-title .link {
+  margin-left: auto;
+}
+
+.y-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  border-bottom: none;
+}
+.y-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+.y-list li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 0;
+  min-height: 24px;
+}
+.y-list li[hidden] {
+  display: none;
+}
+.y-list li.disabled {
+  color: var(--muted);
+}
+.y-list label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+.y-list .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.swatch {
+  flex: none;
+  width: 16px;
+  height: 0;
+  border-top-width: 3px;
+}
+.tag {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 0 4px;
+}
+
+select,
+input[type="search"] {
+  background: var(--vscode-dropdown-background);
+  color: var(--vscode-dropdown-foreground);
+  border: 1px solid var(--vscode-dropdown-border, var(--border));
+  border-radius: 2px;
+  padding: 2px 4px;
+  font: inherit;
+  min-width: 0;
+}
+input[type="search"] {
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border-color: var(--vscode-input-border, var(--border));
+}
+#x-select {
+  width: 100%;
+}
+select.axis-tag {
+  flex: none;
+  font-size: 11px;
+  padding: 0 2px;
+}
+
+button {
+  font: inherit;
+  color: var(--vscode-button-foreground);
+  background: var(--vscode-button-background);
+  border: none;
+  border-radius: 2px;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+button:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+button.link,
+button.icon {
+  background: none;
+  color: var(--vscode-textLink-foreground);
+  padding: 0 4px;
+}
+button.icon {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.segmented button {
+  padding: 3px 4px;
+  background: none;
+  color: var(--vscode-foreground);
+  border-radius: 0;
+}
+.segmented button.active {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.notices:empty {
+  display: none;
+}
+.notices {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.notice {
+  font-size: 12px;
+  padding: 4px 6px;
+  margin: 2px 0;
+  border-left: 3px solid var(--vscode-editorWarning-foreground, #cca700);
+  background: var(--vscode-inputValidation-warningBackground, rgba(204, 167, 0, 0.1));
+}
+
+section[hidden],
+button[hidden] {
+  display: none;
+}

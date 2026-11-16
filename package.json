@@ -1,0 +1,164 @@
+{
+  "name": "vscode-csv-plot",
+  "displayName": "CSV & Excel Plot",
+  "description": "Plot the columns of a CSV file or an Excel sheet as interactive line or stacked-area charts or histograms with statistics, with timestamp support and automatic multiple Y axes.",
+  "version": "0.3.0",
+  "publisher": "harrahx3",
+  "author": {
+    "name": "harrahx3"
+  },
+  "license": "MIT",
+  "icon": "assets/marketplace-icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harrahx3/vscode-csv-plot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/harrahx3/vscode-csv-plot/issues"
+  },
+  "homepage": "https://github.com/harrahx3/vscode-csv-plot#readme",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Visualization",
+    "Data Science"
+  ],
+  "keywords": [
+    "csv",
+    "tsv",
+    "chart",
+    "plot",
+    "time series",
+    "excel",
+    "xlsx",
+    "xls"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "csvPlot.graph",
+        "displayName": "CSV Plot (graph view)",
+        "priority": "option",
+        "selector": [
+          {
+            "filenamePattern": "*.csv"
+          },
+          {
+            "filenamePattern": "*.tsv"
+          }
+        ]
+      },
+      {
+        "viewType": "csvPlot.excelGraph",
+        "displayName": "CSV Plot (Excel graph view)",
+        "priority": "default",
+        "selector": [
+          {
+            "filenamePattern": "*.xlsx"
+          },
+          {
+            "filenamePattern": "*.xlsm"
+          },
+          {
+            "filenamePattern": "*.xls"
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "csvPlot.openGraph",
+        "title": "Open as Graph",
+        "category": "CSV Plot",
+        "icon": "$(graph-line)"
+      },
+      {
+        "command": "csvPlot.showRaw",
+        "title": "Show Raw CSV",
+        "category": "CSV Plot",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "csvPlot.reload",
+        "title": "Reload Workbook",
+        "category": "CSV Plot",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "csvPlot.openGraph",
+          "when": "((resourceExtname == .csv || resourceExtname == .tsv) && activeCustomEditorId != csvPlot.graph) || ((resourceExtname == .xlsx || resourceExtname == .xlsm || resourceExtname == .xls) && activeCustomEditorId != csvPlot.excelGraph)",
+          "group": "navigation"
+        },
+        {
+          "command": "csvPlot.showRaw",
+          "when": "activeCustomEditorId == csvPlot.graph",
+          "group": "navigation"
+        },
+        {
+          "command": "csvPlot.reload",
+          "when": "activeCustomEditorId == csvPlot.excelGraph",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "csvPlot.showRaw",
+          "when": "activeCustomEditorId == csvPlot.graph"
+        },
+        {
+          "command": "csvPlot.reload",
+          "when": "activeCustomEditorId == csvPlot.excelGraph"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "CSV Plot",
+      "properties": {
+        "csvPlot.confirmAboveMB": {
+          "type": "number",
+          "default": 50,
+          "minimum": 0,
+          "description": "Ask for confirmation before plotting a file larger than this size (in MB). 0 disables the confirmation."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc -p . --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:browser": "npm run build && node test/browser/run.mjs",
+    "test:vscode": "npm run build && tsc -p test/vscode && node out/test/vscode/runTest.js",
+    "package": "npm run notices && npm run build -- --production && vsce package --no-dependencies",
+    "notices": "node scripts/notices.mjs"
+  },
+  "dependencies": {
+    "echarts": "6.1.0",
+    "fflate": "0.8.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "22.20.5",
+    "@types/vscode": "1.90.0",
+    "@vscode/test-electron": "3.1.0",
+    "@vscode/vsce": "4.1.0",
+    "esbuild": "0.28.2",
+    "eslint": "10.14.0",
+    "globals": "17.14.0",
+    "jsdom": "29.1.1",
+    "playwright-core": "1.65.0",
+    "prettier": "3.9.10",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.1.0"
+  }
+}

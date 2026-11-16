@@ -273,13 +273,17 @@ await scenario("histogram zoom re-bins the zoomed range", async (p) => {
   assert.ok(zoomed.width <= full.width, `width ${zoomed.width} <= ${full.width}`);
   assert.ok(zoomed.n >= 10, `${zoomed.n} bins`);
 
-  // Area zoom from the toolbox (same action): the note reports the values inside.
+  // Area zoom from the toolbox (same action): the note reports the values inside. The note
+  // already shows the wheel zoom, and re-binning waits for the next animation frame: wait for
+  // the note to change, not just for it to match.
+  const wheelNote = await p.locator(".zoom-note").textContent();
   await p.evaluate(() =>
     window.__csvPlotChart.dispatchAction({ type: "dataZoom", start: 40, end: 60 }),
   );
-  await p.waitForFunction(() =>
-    /^Zoomed on .* values \(/.test(document.querySelector(".zoom-note").textContent),
-  );
+  await p.waitForFunction((before) => {
+    const text = document.querySelector(".zoom-note").textContent;
+    return text !== before && /^Zoomed on .* values \(/.test(text);
+  }, wheelNote);
   zoomed = await bins();
   const span = full.to - full.from;
   assert.ok(zoomed.from <= full.from + 0.4 * span + zoomed.width, "first bin at the window");

@@ -113,7 +113,7 @@ export class Panel {
     this.filter.addEventListener("input", () => this.applyFilter());
     root.append(
       el("header", { className: "panel-header" }, [
-        el("span", { textContent: "CSV Plot" }),
+        el("span", { textContent: "CSV & Excel Plot" }),
         collapse,
       ]),
       this.settings,

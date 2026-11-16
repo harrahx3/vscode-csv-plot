@@ -31,7 +31,7 @@ export function webviewHtml(webview: vscode.Webview, extensionUri: vscode.Uri): 
   <meta http-equiv="Content-Security-Policy" content="${csp}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="${asset("webview.css")}">
-  <title>CSV Plot</title>
+  <title>CSV &amp; Excel Plot</title>
 </head>
 <body>
   <div id="app">

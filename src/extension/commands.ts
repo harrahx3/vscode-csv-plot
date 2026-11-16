@@ -25,7 +25,7 @@ async function reopenWith(
   const group = vscode.window.tabGroups.activeTabGroup;
   const target = uri ?? tabUri(group.activeTab) ?? vscode.window.activeTextEditor?.document.uri;
   if (!target) {
-    void vscode.window.showInformationMessage("CSV Plot: open a CSV or Excel file first.");
+    void vscode.window.showInformationMessage("CSV & Excel Plot: open a CSV or Excel file first.");
     return;
   }
   const viewType = typeof view === "string" ? view : view(target);

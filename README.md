@@ -34,7 +34,8 @@ Each release's `.vsix` is also attached to the [GitHub Releases](https://github.
 ## Use
 
 Open a CSV file and click the chart icon (**Open as Graph**) in the editor title bar — or run
-**CSV Plot: Open as Graph** from the command palette, or **Reopen Editor With… → CSV Plot**.
+**CSV & Excel Plot: Open as Graph** from the command palette, or **Reopen Editor With… → CSV &
+Excel Plot**.
 
 In the left panel:
 
@@ -71,7 +72,7 @@ keeps the zoom; _Reset zoom_ goes back to the whole column.
 ### Excel workbooks
 
 Opening an `.xlsx`, `.xlsm` or `.xls` file shows it in the graph view right away (or use **Reopen Editor
-With… → CSV Plot (Excel graph view)** if another Excel extension opened it).
+With… → CSV & Excel Plot (Excel graph view)** if another Excel extension opened it).
 
 - **Sheet**: the panel shows a sheet list instead of Separator / Decimal. The first time, the
   sheet that was active when the file was last saved in Excel is shown. Hidden sheets are listed

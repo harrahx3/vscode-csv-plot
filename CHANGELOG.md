@@ -5,6 +5,8 @@
 - Published on GitHub and the Visual Studio Marketplace under the MIT license, as
   _CSV & Excel Plot_. The extension ID is now `harrahx3.vscode-csv-plot`:
   uninstall a build installed earlier from a `.vsix` with another ID, or both run side by side.
+- The command palette category, the settings section and the graph view are now called
+  _CSV & Excel Plot_ too. Settings (`csvPlot.*`) and command IDs are unchanged.
 
 ## 0.3.0 — 2026-11-09
 

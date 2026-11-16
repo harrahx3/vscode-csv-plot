@@ -40,7 +40,7 @@
     "customEditors": [
       {
         "viewType": "csvPlot.graph",
-        "displayName": "CSV Plot (graph view)",
+        "displayName": "CSV & Excel Plot (graph view)",
         "priority": "option",
         "selector": [
           {
@@ -53,7 +53,7 @@
       },
       {
         "viewType": "csvPlot.excelGraph",
-        "displayName": "CSV Plot (Excel graph view)",
+        "displayName": "CSV & Excel Plot (Excel graph view)",
         "priority": "default",
         "selector": [
           {
@@ -72,19 +72,19 @@
       {
         "command": "csvPlot.openGraph",
         "title": "Open as Graph",
-        "category": "CSV Plot",
+        "category": "CSV & Excel Plot",
         "icon": "$(graph-line)"
       },
       {
         "command": "csvPlot.showRaw",
         "title": "Show Raw CSV",
-        "category": "CSV Plot",
+        "category": "CSV & Excel Plot",
         "icon": "$(file-code)"
       },
       {
         "command": "csvPlot.reload",
         "title": "Reload Workbook",
-        "category": "CSV Plot",
+        "category": "CSV & Excel Plot",
         "icon": "$(refresh)"
       }
     ],
@@ -118,7 +118,7 @@
       ]
     },
     "configuration": {
-      "title": "CSV Plot",
+      "title": "CSV & Excel Plot",
       "properties": {
         "csvPlot.confirmAboveMB": {
           "type": "number",

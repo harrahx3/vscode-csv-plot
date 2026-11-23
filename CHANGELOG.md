@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0 — 2026-11-23
+
+- **Right-click menu** in the graph view, instead of the default Cut / Copy / Paste:
+  - on the chart: switch between Lines, Stacked and Histogram, reset the zoom, hide or show the
+    panel, **save the chart as PNG** (with a save dialog, next to the file by default), show the
+    raw CSV or reload the workbook;
+  - on a column of the panel: plot only this column, show its histogram, use it as the X axis,
+    copy its name;
+  - on the statistics card: **copy the statistics** as tab-separated lines for a spreadsheet.
+- Text fields keep the Cut / Copy / Paste menu.
+
 ## 1.0.1 — 2026-11-16
 
 - The changelog of 1.0.0 now lists every change of that release; the first 1.0.0 package

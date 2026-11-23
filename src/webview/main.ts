@@ -12,11 +12,18 @@ import {
 } from "echarts/components";
 import * as echarts from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import type { HostToWebview, PlotState, WebviewToHost, WorkbookState } from "../shared/messages";
+import type {
+  HostToWebview,
+  MenuAction,
+  PlotState,
+  WebviewToHost,
+  WorkbookState,
+} from "../shared/messages";
 import { assignAxes } from "./axes";
 import { buildChartOption, isMonotonic, seriesStyle, type ChartTheme } from "./chartOptions";
 import { buildHistogramOption } from "./histogramOption";
 import { HistogramZoom } from "./histogramZoom";
+import { menuPatch, setMenuContext } from "./menu";
 import { initResizer, readTheme } from "./page";
 import { Panel } from "./panel";
 import { tableFromSheet } from "./parse/sheetTable";
@@ -24,7 +31,7 @@ import { parseTable, type Column, type NumericColumn, type Table } from "./parse
 import { readWorkbook } from "./parse/readWorkbook";
 import type { Workbook } from "./parse/workbook";
 import { autoBinCount, columnStats, histogram, sortedValues, type ColumnStats } from "./stats";
-import { StatsCard } from "./statsCard";
+import { StatsCard, statsText } from "./statsCard";
 
 echarts.use([
   CustomChart,
@@ -48,6 +55,7 @@ const app = document.getElementById("app")!;
 const chartEl = document.getElementById("chart")!;
 const overlay = document.getElementById("overlay")!;
 const expand = document.getElementById("expand")!;
+const chartWrap = document.getElementById("chart-wrap")!;
 
 /** The CSV text, or the workbook and the sheet shown. */
 let source: { kind: "csv"; text: string } | { kind: "workbook"; book: Workbook } | null = null;
@@ -88,6 +96,7 @@ const statsCard = new StatsCard(document.getElementById("stats")!, (bins) =>
   update({ histogram: { ...state.histogram, bins } }),
 );
 let histStats: ColumnStats | null = null;
+let histName = "";
 const histZoom = new HistogramZoom(
   (view) =>
     histStats &&
@@ -121,6 +130,8 @@ window.addEventListener("message", (event: MessageEvent<HostToWebview>) => {
     if (source?.kind === "workbook") openWorkbook(msg.data);
   } else if (msg.type === "error") {
     showOverlay(msg.message);
+  } else if (msg.type === "menu") {
+    onMenu(msg.action, msg.column);
   } else if (msg.type === "tooLarge") {
     showOverlay(
       `This file is ${msg.sizeMb.toFixed(0)} MB. Plotting it may take a while.`,
@@ -337,6 +348,7 @@ function drawHistogram(t: Table, theme: ChartTheme, what: string): void {
   const extent: [number, number] = [full.start, full.start + full.counts.length * full.width];
   const view = histZoom.show(col.name, sorted, targetBins, extent);
   histStats = stats;
+  histName = col.name;
   showStats(true);
   statsCard.render({
     stats,
@@ -372,6 +384,14 @@ function showStats(visible: boolean): void {
 
 function reportStatus(overlayText: string | null, series: string[] = []): void {
   const book = source?.kind === "workbook" ? source.book : null;
+  const hasChart = overlayText === null;
+  setMenuContext(chartWrap, {
+    webviewSection: "chart",
+    mode: state.mode ?? "lines",
+    hasChart,
+    statsShown: hasChart && state.mode === "histogram",
+    panelHidden: !!state.panelCollapsed,
+  });
   post({
     type: "status",
     status: {
@@ -383,6 +403,26 @@ function reportStatus(overlayText: string | null, series: string[] = []): void {
       mode: state.mode,
     },
   });
+}
+
+/** A right-click menu item, sent back by the extension host. */
+function onMenu(action: MenuAction, column?: string): void {
+  const patch = menuPatch(action, column, state);
+  if (patch) return update(patch);
+  if (action === "resetZoom") chart?.dispatchAction({ type: "restore" });
+  else if (action === "copyStats" && histStats && state.mode === "histogram")
+    post({ type: "copy", text: statsText(histName, histStats), what: "Statistics" });
+  else if (action === "savePng" && chart) {
+    const base = fileName.replace(/\.[^.]+$/, "");
+    const sheet = source?.kind === "workbook" ? ` - ${bookState.sheet}` : "";
+    const dataUrl = chart.getDataURL({
+      type: "png",
+      pixelRatio: 2,
+      backgroundColor: readTheme().background,
+      excludeComponents: ["toolbox"],
+    });
+    post({ type: "saveImage", dataUrl, fileName: `${base}${sheet}.png` });
+  }
 }
 
 /** Keeps the zoomed range when only the Y selection or the mode changed. */

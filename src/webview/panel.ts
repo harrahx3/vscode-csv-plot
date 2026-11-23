@@ -3,7 +3,8 @@ import type { DisplayMode } from "../shared/messages";
 import type { AxisAssignment } from "./axes";
 import { seriesStyle } from "./chartOptions";
 import { DECIMALS, SEPARATORS } from "./parse/detect";
-import type { Table } from "./parse/table";
+import type { Column, Table } from "./parse/table";
+import { KEEP_DEFAULT_MENU, setMenuContext } from "./menu";
 
 export const ROW_NUMBER = "__row__";
 const AUTO = "";
@@ -111,6 +112,7 @@ export class Panel {
     const collapse = el("button", { className: "icon", textContent: "⟨", title: "Hide panel" });
     collapse.addEventListener("click", () => events.collapse(true));
     this.filter.addEventListener("input", () => this.applyFilter());
+    this.filter.dataset.vscodeContext = KEEP_DEFAULT_MENU;
     root.append(
       el("header", { className: "panel-header" }, [
         el("span", { textContent: "CSV & Excel Plot" }),
@@ -232,6 +234,7 @@ export class Panel {
       ]);
       const li = el("li", { className: usable ? "" : "disabled" }, [label]);
       li.dataset.name = col.name.toLowerCase();
+      columnMenu(li, col, m);
       if (!usable) li.append(el("span", { className: "tag", textContent: col.kind }));
       return li;
     });
@@ -259,6 +262,7 @@ export class Panel {
       ]);
       const li = el("li", { className: plottable ? "" : "disabled" }, [label]);
       li.dataset.name = col.name.toLowerCase();
+      columnMenu(li, col, m);
       if (!plottable) {
         li.append(
           el("span", { className: "tag", textContent: col.kind === "text" ? "text" : "X" }),
@@ -293,4 +297,15 @@ export class Panel {
       li.hidden = q !== "" && !(li.dataset.name ?? "").includes(q);
     }
   }
+}
+
+/** Right-click on a column row: plot only it, its histogram, use it as X, copy its name. */
+function columnMenu(li: HTMLElement, col: Column, m: PanelModel): void {
+  setMenuContext(li, {
+    webviewSection: "column",
+    column: col.name,
+    plottable: col.kind !== "text" && col.name !== m.x,
+    isNumber: col.kind === "number",
+    isX: col.name === m.x && m.mode !== "histogram",
+  });
 }

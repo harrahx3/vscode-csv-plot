@@ -49,6 +49,16 @@ In the left panel:
 
 Click the file icon (**Show Raw CSV**) to go back to the text.
 
+### Right-click menu
+
+| Where you right-click | What it offers                                                                                                                                               |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The chart             | Lines / Stacked / Histogram, _Reset Zoom_, _Hide Panel_ (or _Show Panel_), _Save Chart as PNG…_ (asks where to save it), _Show Raw CSV_ or _Reload Workbook_ |
+| A column in the panel | _Plot Only This Column_, _Show Histogram of This Column_, _Use as X Axis_, _Copy Column Name_                                                                |
+| The statistics card   | _Copy Statistics_: label and value per line, tab-separated, ready to paste into a spreadsheet                                                                |
+
+Text fields (the column filter) keep the usual Cut / Copy / Paste menu.
+
 ### Histogram and statistics
 
 Click **Histogram** to see the distribution of one column. The column list becomes a single

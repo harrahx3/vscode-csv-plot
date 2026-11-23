@@ -49,6 +49,7 @@ export class StatsCard {
     this.zoomNote.className = "zoom-note";
     this.zoomNote.hidden = true;
     root.append(label, this.zoomNote, this.table);
+    root.dataset.vscodeContext = JSON.stringify({ webviewSection: "stats" });
   }
 
   render(m: StatsCardModel): void {
@@ -96,4 +97,11 @@ export class StatsCard {
   show(visible: boolean): void {
     this.root.hidden = !visible;
   }
+}
+
+/** The statistics as tab-separated lines (label, value), to paste into a spreadsheet. */
+export function statsText(column: string, stats: ColumnStats): string {
+  return [["Column", column], ...ROWS.map(([label, key]) => [label, String(stats[key])])]
+    .map((row) => row.join("\t"))
+    .join("\n");
 }

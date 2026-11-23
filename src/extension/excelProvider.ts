@@ -4,6 +4,7 @@ import type { HostToWebview, WebviewToHost, WorkbookState } from "../shared/mess
 import { initWebview } from "./html";
 import type { StateStore } from "./stateStore";
 import type { StatusBoard } from "./statusBoard";
+import { handleViewMessage, registerView } from "./viewMenu";
 
 export const EXCEL_VIEW_TYPE = "csvPlot.excelGraph";
 export const EXCEL_EXTENSIONS = [".xlsx", ".xlsm", ".xls"];
@@ -35,7 +36,8 @@ export class ExcelGraphProvider implements vscode.CustomReadonlyEditorProvider {
   resolveCustomEditor(document: vscode.CustomDocument, panel: vscode.WebviewPanel): void {
     const { uri } = document;
     const webview = panel.webview;
-    initWebview(webview, this.extensionUri);
+    const view = registerView({ webview, uri });
+    initWebview(webview, this.extensionUri, view.id);
     const post = (message: HostToWebview) => void webview.postMessage(message);
     const fileName = path.basename(uri.path);
 
@@ -74,6 +76,7 @@ export class ExcelGraphProvider implements vscode.CustomReadonlyEditorProvider {
       }, RELOAD_DELAY_MS);
     };
     this.reloaders.set(panel, reload);
+    view.view.reload = reload;
 
     const watcher = vscode.workspace.createFileSystemWatcher(
       new vscode.RelativePattern(vscode.Uri.joinPath(uri, ".."), fileName),
@@ -88,12 +91,14 @@ export class ExcelGraphProvider implements vscode.CustomReadonlyEditorProvider {
         else if (msg.type === "forceLoad") void load(true);
         else if (msg.type === "saveState") void this.states.set(uri, msg.state);
         else if (msg.type === "status") this.statuses.set(uri, msg.status);
+        else void handleViewMessage(msg, uri);
         if (msg.type === "ready" || msg.type === "forceLoad") loaded = true;
       }),
     ];
     panel.onDidDispose(() => {
       clearTimeout(timer);
       this.reloaders.delete(panel);
+      view.dispose();
       subscriptions.forEach((s) => s.dispose());
     });
   }

@@ -86,6 +86,90 @@
         "title": "Reload Workbook",
         "category": "CSV & Excel Plot",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "csvPlot.menu.lines",
+        "title": "Show as Lines",
+        "category": "CSV & Excel Plot",
+        "icon": "$(graph-line)"
+      },
+      {
+        "command": "csvPlot.menu.stacked",
+        "title": "Show as Stacked Areas",
+        "category": "CSV & Excel Plot",
+        "icon": "$(graph-left)"
+      },
+      {
+        "command": "csvPlot.menu.histogram",
+        "title": "Show Histogram",
+        "category": "CSV & Excel Plot",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "csvPlot.menu.plotOnly",
+        "title": "Plot Only This Column",
+        "category": "CSV & Excel Plot",
+        "icon": "$(graph-line)"
+      },
+      {
+        "command": "csvPlot.menu.histogramOf",
+        "title": "Show Histogram of This Column",
+        "category": "CSV & Excel Plot",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "csvPlot.menu.useAsX",
+        "title": "Use as X Axis",
+        "category": "CSV & Excel Plot",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "csvPlot.menu.copyColumnName",
+        "title": "Copy Column Name",
+        "category": "CSV & Excel Plot",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "csvPlot.menu.resetZoom",
+        "title": "Reset Zoom",
+        "category": "CSV & Excel Plot",
+        "icon": "$(zoom-out)"
+      },
+      {
+        "command": "csvPlot.menu.hidePanel",
+        "title": "Hide Panel",
+        "category": "CSV & Excel Plot",
+        "icon": "$(layout-sidebar-left-off)"
+      },
+      {
+        "command": "csvPlot.menu.showPanel",
+        "title": "Show Panel",
+        "category": "CSV & Excel Plot",
+        "icon": "$(layout-sidebar-left)"
+      },
+      {
+        "command": "csvPlot.menu.savePng",
+        "title": "Save Chart as PNG…",
+        "category": "CSV & Excel Plot",
+        "icon": "$(save)"
+      },
+      {
+        "command": "csvPlot.menu.copyStats",
+        "title": "Copy Statistics",
+        "category": "CSV & Excel Plot",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "csvPlot.menu.showRaw",
+        "title": "Show Raw CSV",
+        "category": "CSV & Excel Plot",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "csvPlot.menu.reload",
+        "title": "Reload Workbook",
+        "category": "CSV & Excel Plot",
+        "icon": "$(refresh)"
       }
     ],
     "menus": {
@@ -114,6 +198,134 @@
         {
           "command": "csvPlot.reload",
           "when": "activeCustomEditorId == csvPlot.excelGraph"
+        },
+        {
+          "command": "csvPlot.menu.lines",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.stacked",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.histogram",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.plotOnly",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.histogramOf",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.useAsX",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.copyColumnName",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.resetZoom",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.hidePanel",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.showPanel",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.savePng",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.copyStats",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.showRaw",
+          "when": "false"
+        },
+        {
+          "command": "csvPlot.menu.reload",
+          "when": "false"
+        }
+      ],
+      "webview/context": [
+        {
+          "command": "csvPlot.menu.lines",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewSection == chart && hasChart && mode != lines",
+          "group": "1_mode@1"
+        },
+        {
+          "command": "csvPlot.menu.stacked",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewSection == chart && hasChart && mode != stacked",
+          "group": "1_mode@2"
+        },
+        {
+          "command": "csvPlot.menu.histogram",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewSection == chart && hasChart && mode != histogram",
+          "group": "1_mode@3"
+        },
+        {
+          "command": "csvPlot.menu.plotOnly",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewSection == column && plottable",
+          "group": "1_column@1"
+        },
+        {
+          "command": "csvPlot.menu.histogramOf",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewSection == column && isNumber",
+          "group": "1_column@2"
+        },
+        {
+          "command": "csvPlot.menu.useAsX",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewSection == column && !isX",
+          "group": "1_column@3"
+        },
+        {
+          "command": "csvPlot.menu.copyColumnName",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewSection == column",
+          "group": "2_copy@1"
+        },
+        {
+          "command": "csvPlot.menu.resetZoom",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewSection == chart && hasChart",
+          "group": "2_view@1"
+        },
+        {
+          "command": "csvPlot.menu.hidePanel",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewSection == chart && !panelHidden",
+          "group": "2_view@2"
+        },
+        {
+          "command": "csvPlot.menu.showPanel",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewSection == chart && panelHidden",
+          "group": "2_view@2"
+        },
+        {
+          "command": "csvPlot.menu.savePng",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewSection == chart && hasChart",
+          "group": "3_export@1"
+        },
+        {
+          "command": "csvPlot.menu.copyStats",
+          "when": "webviewId =~ /^csvPlot\\./ && statsShown && webviewSection != column",
+          "group": "3_export@2"
+        },
+        {
+          "command": "csvPlot.menu.showRaw",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewId == csvPlot.graph && webviewSection != column",
+          "group": "4_file@1"
+        },
+        {
+          "command": "csvPlot.menu.reload",
+          "when": "webviewId =~ /^csvPlot\\./ && webviewId == csvPlot.excelGraph && webviewSection != column",
+          "group": "4_file@1"
         }
       ]
     },

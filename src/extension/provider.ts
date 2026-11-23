@@ -4,6 +4,7 @@ import type { HostToWebview, PlotState, WebviewToHost } from "../shared/messages
 import { initWebview } from "./html";
 import type { StateStore } from "./stateStore";
 import type { StatusBoard } from "./statusBoard";
+import { handleViewMessage, registerView } from "./viewMenu";
 
 export const VIEW_TYPE = "csvPlot.graph";
 const UPDATE_DELAY_MS = 400;
@@ -21,7 +22,8 @@ export class GraphEditorProvider implements vscode.CustomTextEditorProvider {
 
   resolveCustomTextEditor(document: vscode.TextDocument, panel: vscode.WebviewPanel): void {
     const webview = panel.webview;
-    initWebview(webview, this.extensionUri);
+    const view = registerView({ webview, uri: document.uri });
+    initWebview(webview, this.extensionUri, view.id);
     const post = (message: HostToWebview) => void webview.postMessage(message);
 
     const load = (force = false) => {
@@ -45,6 +47,7 @@ export class GraphEditorProvider implements vscode.CustomTextEditorProvider {
         else if (msg.type === "forceLoad") load(true);
         else if (msg.type === "saveState") void this.states.set(document.uri, msg.state);
         else if (msg.type === "status") this.statuses.set(document.uri, msg.status);
+        else void handleViewMessage(msg, document.uri);
         if (msg.type === "ready" || msg.type === "forceLoad") loaded = true;
       }),
       vscode.workspace.onDidChangeTextDocument((e) => {
@@ -58,6 +61,7 @@ export class GraphEditorProvider implements vscode.CustomTextEditorProvider {
     ];
     panel.onDidDispose(() => {
       clearTimeout(timer);
+      view.dispose();
       subscriptions.forEach((s) => s.dispose());
     });
   }

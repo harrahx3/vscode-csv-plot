@@ -1,16 +1,29 @@
 import * as vscode from "vscode";
 
 /** Allows the bundled scripts only and loads the graph view page. */
-export function initWebview(webview: vscode.Webview, extensionUri: vscode.Uri): void {
+export function initWebview(
+  webview: vscode.Webview,
+  extensionUri: vscode.Uri,
+  viewId: string,
+): void {
   webview.options = {
     enableScripts: true,
     localResourceRoots: [vscode.Uri.joinPath(extensionUri, "dist")],
   };
-  webview.html = webviewHtml(webview, extensionUri);
+  webview.html = webviewHtml(webview, extensionUri, viewId);
 }
 
-/** HTML shell of the graph view, with a strict Content-Security-Policy (bundled scripts only). */
-export function webviewHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
+/**
+ * HTML shell of the graph view, with a strict Content-Security-Policy (bundled scripts only).
+ * The body's right-click context hides the default Cut/Copy/Paste items (text fields bring them
+ * back) and names the view, so the menu commands know which one was clicked.
+ */
+export function webviewHtml(
+  webview: vscode.Webview,
+  extensionUri: vscode.Uri,
+  viewId: string,
+): string {
+  const menuContext = JSON.stringify({ preventDefaultContextMenuItems: true, plotView: viewId });
   const asset = (file: string) =>
     webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "dist", file));
   const nonce = Array.from({ length: 32 }, () => Math.floor(Math.random() * 36).toString(36)).join(
@@ -33,7 +46,7 @@ export function webviewHtml(webview: vscode.Webview, extensionUri: vscode.Uri): 
   <link rel="stylesheet" href="${asset("webview.css")}">
   <title>CSV &amp; Excel Plot</title>
 </head>
-<body>
+<body data-vscode-context='${menuContext}'>
   <div id="app">
     <aside id="panel"></aside>
     <div id="resizer" title="Drag to resize"></div>

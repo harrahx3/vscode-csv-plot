@@ -377,6 +377,72 @@ await scenario("live update keeps the selection", async (p) => {
   );
 });
 
+await scenario("right-click menu: contexts, then each item's action", async (p) => {
+  await load(p, hourlySemicolon());
+  await waitChart(p);
+  const ctx = (sel) =>
+    p
+      .locator(sel)
+      .first()
+      .evaluate((el) => JSON.parse(el.dataset.vscodeContext ?? "null"));
+  const menu = (action, column) =>
+    p.evaluate(
+      ([action, column]) => window.postMessage({ type: "menu", action, column }, "*"),
+      [action, column],
+    );
+  assert.deepEqual(await ctx("#chart-wrap"), {
+    webviewSection: "chart",
+    mode: "lines",
+    hasChart: true,
+    statsShown: false,
+    panelHidden: false,
+  });
+  assert.deepEqual(await ctx(".y-list li[data-name=t_out_c]"), {
+    webviewSection: "column",
+    column: "t_out_c",
+    plottable: true,
+    isNumber: true,
+    isX: false,
+  });
+  assert.equal((await ctx(".filter")).preventDefaultContextMenuItems, false);
+  // VS Code ignores a right-click whose default the page prevented: ECharts must not.
+  const prevented = await p.evaluate(() => {
+    const canvas = document.querySelector("#chart canvas");
+    const e = new MouseEvent("contextmenu", { bubbles: true, cancelable: true, button: 2 });
+    canvas.dispatchEvent(e);
+    return e.defaultPrevented;
+  });
+  assert.equal(prevented, false, "right-click on the chart reaches VS Code");
+
+  await menu("plotOnly", "t_out_c");
+  await p.waitForFunction(() => {
+    const s = window.__csvPlotChart.getOption().series;
+    return s.length === 1 && s[0].name === "t_out_c";
+  });
+  await menu("histogramOf", "q_demand_kw");
+  await p.waitForSelector("#stats:not([hidden])");
+  assert.equal((await option(p)).title[0].text, "q_demand_kw");
+  assert.equal((await ctx("#chart-wrap")).statsShown, true);
+  assert.deepEqual(await ctx("#stats"), { webviewSection: "stats" });
+  await menu("copyStats");
+  const copy = await p.evaluate(() => window.__sent.find((m) => m.type === "copy"));
+  assert.match(copy.text, /^Column\tq_demand_kw\nCount\t8760\n/);
+  await menu("savePng");
+  const image = await p.evaluate(() => window.__sent.find((m) => m.type === "saveImage"));
+  assert.match(image.dataUrl, /^data:image\/png;base64,/);
+  assert.equal(image.fileName, "data.png");
+  await menu("lines");
+  await p.waitForFunction(() => window.__csvPlotChart.getOption().series[0].type === "line");
+  await menu("hidePanel");
+  await p.waitForSelector("#expand", { state: "visible" });
+  assert.equal((await ctx("#chart-wrap")).panelHidden, true);
+  await menu("showPanel");
+  await p.waitForSelector("#panel", { state: "visible" });
+  await menu("useAsX", "q_demand_kw");
+  await p.waitForFunction(() => window.__csvPlotChart.getOption().xAxis[0].name === "q_demand_kw");
+  assert.equal((await ctx(".y-list li[data-name=q_demand_kw]")).isX, true);
+});
+
 await scenario("too-large file asks before plotting", async (p) => {
   await p.evaluate(() => window.postMessage({ type: "tooLarge", sizeMb: 120 }, "*"));
   await p.click("#overlay button");

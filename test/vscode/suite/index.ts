@@ -2,6 +2,7 @@
 import * as assert from "assert";
 import * as path from "path";
 import * as vscode from "vscode";
+import { env } from "vscode";
 
 const VIEW_TYPE = "csvPlot.graph";
 const EXCEL_VIEW_TYPE = "csvPlot.excelGraph";
@@ -25,6 +26,7 @@ interface ViewStatus {
   sheet?: string;
   series: string[];
   rows: number;
+  mode?: string;
 }
 /** What the graph view of `uri` reports it shows (see CsvPlotApi in src/extension). */
 async function viewStatus(uri: vscode.Uri): Promise<ViewStatus | undefined> {
@@ -32,6 +34,21 @@ async function viewStatus(uri: vscode.Uri): Promise<ViewStatus | undefined> {
     "harrahx3.vscode-csv-plot",
   )!;
   return (await ext.activate()).viewStatus(uri);
+}
+/** The id a right-click in the graph view of `uri` passes to the menu commands. */
+async function viewId(uri: vscode.Uri): Promise<string | undefined> {
+  const ext = vscode.extensions.getExtension<{ viewId(u: vscode.Uri): string | undefined }>(
+    "harrahx3.vscode-csv-plot",
+  )!;
+  return (await ext.activate()).viewId(uri);
+}
+/** Polls an async check (the view answers through messages). */
+async function eventually(check: () => Promise<boolean>, what: string): Promise<void> {
+  const start = Date.now();
+  while (!(await check())) {
+    if (Date.now() - start > 10_000) throw new Error(`timed out waiting for ${what}`);
+    await new Promise((r) => setTimeout(r, 100));
+  }
 }
 async function waitForChart(uri: vscode.Uri): Promise<ViewStatus> {
   const start = Date.now();
@@ -87,6 +104,36 @@ const tests: [string, () => Promise<void>][] = [
       assert.ok(vscode.extensions.getExtension("harrahx3.vscode-csv-plot")?.isActive);
       const status = await waitForChart(uri);
       assert.strictEqual(status.rows, 8760);
+    },
+  ],
+  [
+    "right-click menu items act on the view they were opened in",
+    async () => {
+      const uri = fixture("hourly_semicolon.csv");
+      const plotView = await viewId(uri);
+      assert.ok(plotView, "the graph view is registered");
+      // The argument is what a right-click passes (the page's data-vscode-context).
+      await vscode.commands.executeCommand("csvPlot.menu.histogramOf", {
+        plotView,
+        webviewSection: "column",
+        column: "t_out_c",
+      });
+      await eventually(async () => {
+        const s = await viewStatus(uri);
+        return s?.mode === "histogram" && s.series[0] === "t_out_c";
+      }, "the histogram of t_out_c");
+      await vscode.commands.executeCommand("csvPlot.menu.copyColumnName", {
+        plotView,
+        column: "q_demand_kw",
+      });
+      assert.strictEqual(await env.clipboard.readText(), "q_demand_kw");
+      await vscode.commands.executeCommand("csvPlot.menu.copyStats", { plotView });
+      await eventually(
+        async () => (await env.clipboard.readText()).startsWith("Column\tt_out_c\n"),
+        "the statistics on the clipboard",
+      );
+      await vscode.commands.executeCommand("csvPlot.menu.lines", { plotView });
+      await eventually(async () => (await viewStatus(uri))?.mode === "lines", "lines again");
     },
   ],
   [
